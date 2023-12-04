@@ -1,22 +1,28 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using Runtime.GameEngine.Factories;
 using Runtime.GameEngine.Interfaces;
 using Runtime.GameEngine.Models;
+using Runtime.Infrastructure.RandomCore.Impl;
+using Runtime.Infrastructure.RandomCore.Interfaces;
+using Runtime.Infrastructure.Utility;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
 namespace Runtime.GameEngine.Behaviours.Candies
 {
     public class CandyHolder : MonoBehaviour
     {
-        [SerializeField] private CandyModel[] candies;
         [SerializeField] private CandyBowl[] candyBowls;
 
-        private Stack<CandyModel> _candyStack;
-
-
-        private void Awake() => 
-            _candyStack = ShuffleCandies();
+        private Stack<CandyType> _candies;
+        private IEnumerable<CandyType> _allCandies;
+        private IRandom _stackShuffleRandom;
+        
+        private void Awake()
+        {
+            _stackShuffleRandom = new ManualRandom();
+            _allCandies = EnumExtensions.GetAllValues<CandyType>();
+        }
 
         private void OnEnable()
         {
@@ -38,26 +44,11 @@ namespace Runtime.GameEngine.Behaviours.Candies
 
         private void UpdateCandyIn(ICandyBowl candyBowl)
         {
-            if (_candyStack == null || _candyStack.Count == 0)
-                _candyStack = ShuffleCandies();
+            if (_candies == null || _candies.Count == 0)
+                _candies = _allCandies.ToShuffleStack(_stackShuffleRandom);
 
-            var nextCandy = _candyStack.Pop();
+            var nextCandy = _candies.Pop();
             candyBowl.PutCandy(nextCandy);
-        }
-
-
-        private Stack<CandyModel> ShuffleCandies()
-        {
-            List<CandyModel> listCopy = candies.ToList();
-            int n = listCopy.Count;
-            while (n > 1)
-            {
-                n--;
-                int k = Random.Range(0, n + 1);
-                (listCopy[k], listCopy[n]) = (listCopy[n], listCopy[k]);
-            }
-
-            return new Stack<CandyModel>(listCopy);
         }
     }
 }

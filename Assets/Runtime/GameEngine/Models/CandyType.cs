@@ -6,28 +6,33 @@
     public enum CandyType
     {
         /// <summary>
-        /// Шоколад
+        /// В виде призрака
         /// </summary>
-        Chocolate,
+        Ghost = 0,
 
         /// <summary>
-        /// Батончик
+        /// В виде тыквы
         /// </summary>
-        NougatBar,
+        Pumpkin = 1,
 
         /// <summary>
-        /// Бисквит
+        /// В виде смерти c косой
         /// </summary>
-        Biscuit,
+        Reaper = 2,
 
         /// <summary>
-        /// Конфета
+        /// В виде скелета
         /// </summary>
-        Candy,
+        Skeleton = 3,
 
         /// <summary>
-        /// Мармелад
+        /// В виде вампира
         /// </summary>
-        Gumdrops
+        Vampire = 4,
+
+        /// <summary>
+        /// В виде зомби
+        /// </summary>
+        Zombie = 5,
     }
 }

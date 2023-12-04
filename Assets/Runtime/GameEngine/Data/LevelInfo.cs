@@ -6,7 +6,7 @@ namespace Runtime.GameEngine.Data
     /// Информация об уровне
     /// </summary>
     
-    [CreateAssetMenu(fileName = "LevelInfo", menuName = "GameEngine/Data")]
+    [CreateAssetMenu(fileName = "LevelInfo", menuName = "GameEngine/Data/LevelInfo")]
     public class LevelInfo : ScriptableObject
     {
         /// <summary>

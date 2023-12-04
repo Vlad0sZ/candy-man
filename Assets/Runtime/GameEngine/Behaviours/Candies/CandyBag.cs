@@ -6,13 +6,13 @@ using UnityEngine.Events;
 namespace Runtime.GameEngine.Behaviours.Candies
 {
     [RequireComponent(typeof(Collider2D))]
-    public class CandyBag : MonoBehaviour, IDraggableTarget<CandyModel>
+    public class CandyBag : MonoBehaviour, IDraggableTarget<CandyType>
     {
         [SerializeField]
         private UnityEvent<CandyType> onCandyInBag;
         public UnityEvent<CandyType> OnCandyInBag => onCandyInBag;
 
-        public void OnDragEnd(CandyModel data) => 
-            onCandyInBag?.Invoke(data.candyType);
+        public void OnDragEnd(CandyType data) => 
+            onCandyInBag?.Invoke(data);
     }
 }

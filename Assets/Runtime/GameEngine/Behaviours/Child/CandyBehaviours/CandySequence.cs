@@ -1,28 +1,29 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Runtime.GameEngine.Behaviours.Bubbles;
 using Runtime.GameEngine.Models;
 using Runtime.Infrastructure.RandomCore.Interfaces;
+using Runtime.Infrastructure.Utility;
 using UnityEngine;
 
 namespace Runtime.GameEngine.Behaviours.Child.CandyBehaviours
 {
     public class CandySequence : ChildCandyBehaviour
     {
-        [SerializeField]
-        private int maxCandies;
-
+        private const int MinSequenceCount = 2;
+        
         private IRandom _random;
         private Stack<CandyType> _candies;
+        private int _maxSequence;
 
-        public override void Init(IRandom random, int maxCandiesCountInABag)
+        public override void Init(IRandom random, int maxCandiesCountInABag, IBubbleBuilder bubbleBuilder)
         {
-            maxCandies = maxCandiesCountInABag;
-            _candies = new Stack<CandyType>(maxCandies);
+            _maxSequence = Mathf.Min(maxCandiesCountInABag, MinSequenceCount);
             _random = random;
-
             CreateSequence();
 
-            Debug.Log($"Candies: {String.Join(',', _candies)}");
+            foreach (var candy in _candies) 
+                bubbleBuilder.AddCandySprite(candy, false);
         }
 
         public override GiftStatus GetCandyStatus(CandyType candyType)
@@ -45,19 +46,8 @@ namespace Runtime.GameEngine.Behaviours.Child.CandyBehaviours
 
 
 
-        private void CreateSequence()
-        {
-            var totalCandies = Enum.GetValues(typeof(CandyType));
-            var maxIndex = totalCandies.Length;
-
-            for (int i = 0; i < maxCandies; i++)
-            {
-                var nextCandyIndex = _random.Next(maxIndex);
-                var nextCandy = (CandyType) totalCandies.GetValue(nextCandyIndex);
-                _candies.Push(nextCandy);
-            }
-
-        }
+        private void CreateSequence() => 
+            _candies = LazyCandies.Value.Take(_maxSequence).ToShuffleStack(_random);
     }
     
 }

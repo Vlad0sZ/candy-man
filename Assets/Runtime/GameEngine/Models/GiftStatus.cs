@@ -8,16 +8,16 @@
         /// <summary>
         /// Нужно больше конфет
         /// </summary>
-        NeedMoreCandies,
+        NeedMoreCandies = 0,
         
         /// <summary>
         /// Не та конфета
         /// </summary>
-        TastelessCandy,
+        TastelessCandy =  1,
         
         /// <summary>
         /// Хватит конфет
         /// </summary>
-        EnoughCandy,
+        EnoughCandy = 2,
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using Runtime.GameEngine.Factories;
 using Runtime.GameEngine.Interfaces;
 using Runtime.GameEngine.Models;
 using Runtime.Infrastructure.DragAndDrop.Behaviours;
@@ -7,14 +8,14 @@ using UnityEngine;
 
 namespace Runtime.GameEngine.Behaviours.Candies
 {
-    public class CandyBowl : DragAndDrop2D<CandyModel>, ICandyBowl
+    public class CandyBowl : DragAndDrop2D<CandyType>, ICandyBowl
     {
-        [SerializeField] private Candy candyPrefab;
+        [SerializeField] private CandyFactory candyFactory;
         public event Action<ICandyBowl> BowlEmpty;
         private Candy _candyInBowl;
         
-        private CandyModel _currentCandy;
-        private CandyModel _nextCandy;
+        private CandyType _currentCandy;
+        private CandyType _nextCandy;
 
         private void OnEnable() => 
             this.IsDragging.OnValueChanged += CandyTaken;
@@ -23,10 +24,9 @@ namespace Runtime.GameEngine.Behaviours.Candies
             this.IsDragging.OnValueChanged -= CandyTaken;
         
 
-        public void PutCandy(CandyModel candy)
+        public void PutCandy(CandyType candy)
         {
-            var candyObject = Instantiate(candyPrefab, transform, true);
-            candyObject.Renderer.sprite = candy.candySprite;
+            var candyObject = candyFactory.Instantiate(candy, transform, true);
             candyObject.CandyTransform.localPosition = Vector3.zero;
             _candyInBowl = candyObject;
             _nextCandy = candy;
@@ -51,7 +51,7 @@ namespace Runtime.GameEngine.Behaviours.Candies
             return candyTransform;
         }
 
-        protected override void OnDragTarget(IDraggableTarget<CandyModel> target) => 
+        protected override void OnDragTarget(IDraggableTarget<CandyType> target) => 
             target.OnDragEnd(_currentCandy);
     }
 }

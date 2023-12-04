@@ -1,47 +1,90 @@
 ﻿using System;
 using System.Linq;
-using Runtime.GameEngine.Behaviours.Candies;
+using Runtime.GameEngine.Behaviours.Bubbles;
+using Runtime.GameEngine.Behaviours.Child.CandyBehaviours;
+using Runtime.GameEngine.Data;
+using Runtime.GameEngine.Interfaces;
 using Runtime.GameEngine.Models;
 using Runtime.Infrastructure.RandomCore.Impl;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 namespace Runtime.GameEngine.Behaviours.Child
 {
-    public class Child : MonoBehaviour
+    public class Child : MonoBehaviour, IChild
     {
         private const int MaxStress = 100;
 
-        [SerializeField] private ChildCandyBehaviour candyBehaviour;
-        [SerializeField] private SpriteRenderer childFace;
-        [SerializeField] private Image childStressBar;
-        [SerializeField] private ChildFaceByStress[] faces;
 
-        [Range(10, 30)]
-        [SerializeField] private int stressIncrement;
-
-        [Range(1, 10)]
-        [SerializeField] private int stressDecrement;
+        [Header("Visual")] 
+        [SerializeField] 
+        private SpriteRenderer childFace;
         
-        [Range(10, 50)]
-        [SerializeField] private int disappointmentIncrement;
+        [SerializeField] 
+        private ChildFaceByStress[] faces;
 
-
-        [Range(1, 5)]
-        [SerializeField] private int maxCandiesInABag;
+        [Header("UI")] 
+        [SerializeField] 
+        private Canvas worldCanvas;
         
-        private int childStress;
+        [SerializeField] 
+        private Image childStressBar;
+        
+        [SerializeField] 
+        private Bubble childBubble;
 
+        [Header("Logic")]
 
+        [Range(10, 30)] 
+        [SerializeField]
+        private int stressIncrement;
+
+        [Range(1, 10)] 
+        [SerializeField]
+        private int stressDecrement;
+
+        [Range(10, 50)] 
+        [SerializeField] 
+        private int disappointmentIncrement;
+
+        [SerializeField] 
+        private UnityEvent<IChild> onChildStatusChanged = new();
+
+        public UnityEvent<IChild> OnChildStatusChanged => onChildStatusChanged;
+
+        private int _childStress;
+        private ChildCandyBehaviour _candyBehaviour;
+        private int _maxCandies;
+        
         public int ChildStress
         {
-            get => childStress;
+            get => _childStress;
             private set
             {
-                childStress = Mathf.Clamp(value, 0, MaxStress);
+                _childStress = Mathf.Clamp(value, 0, MaxStress);
                 UpdateFace();
             }
         }
+
+        public ChildStatus ChildStatus { get; private set; }
+        public int StressIncrement => disappointmentIncrement;
+        public int StressDecrement => Mathf.Max(0, ChildStress - stressDecrement * 2);
+
+        public void DestroyChild()
+        {
+            if (this != null && gameObject != null)
+                Destroy(gameObject);
+        }
+
+
+        public void Init(ChildInformation childInformation)
+        {
+            worldCanvas.worldCamera = childInformation.WorldCamera;
+            _candyBehaviour = childInformation.CandyBehaviour;
+            _maxCandies = childInformation.MaxCandyInABag;
+        }
+
 
         private void Start() => 
             InitChild();
@@ -49,15 +92,24 @@ namespace Runtime.GameEngine.Behaviours.Child
         [ContextMenu(nameof(InitChild))]
         private void InitChild()
         {
-            childStress = 0;
+            _childStress = 0;
             UpdateFace();
-            candyBehaviour.Init(new UnityRandom(), maxCandiesInABag);
+            _candyBehaviour.Init(new UnityRandom(), _maxCandies, childBubble.Builder());
         }
+
+
+        [ContextMenu(nameof(MakeHappy))]
+        private void MakeHappy() => 
+            UpdateStatus(ChildStatus.Happy);
+
+        [ContextMenu(nameof(MakeStress))]
+        private void MakeStress() => 
+            UpdateStatus(ChildStatus.Sad);
 
 
         public void GiveCandy(CandyType candyType)
         {
-            var status = candyBehaviour.GetCandyStatus(candyType);
+            var status = _candyBehaviour.GetCandyStatus(candyType);
 
             switch (status)
             {
@@ -65,7 +117,7 @@ namespace Runtime.GameEngine.Behaviours.Child
                 case GiftStatus.NeedMoreCandies:
                     UpdateStressStatus(-stressDecrement);
                     break;
-                    
+
                 // Неправильный выбор конфеты
                 case GiftStatus.TastelessCandy:
                     UpdateStressStatus(stressIncrement);
@@ -73,9 +125,9 @@ namespace Runtime.GameEngine.Behaviours.Child
 
                 // достаточно конфет для ребенка
                 case GiftStatus.EnoughCandy:
-                    // TODO destroy this child
+                    UpdateStatus(ChildStatus.Happy);
                     break;
-                
+
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -87,9 +139,13 @@ namespace Runtime.GameEngine.Behaviours.Child
             ChildStress += increment;
 
             if (ChildStress >= MaxStress)
-            {
-                // TODO invoke child sad :(
-            }
+                UpdateStatus(ChildStatus.Sad);
+        }
+
+        private void UpdateStatus(ChildStatus status)
+        {
+            ChildStatus = status;
+            onChildStatusChanged?.Invoke(this);
         }
 
 
@@ -97,13 +153,12 @@ namespace Runtime.GameEngine.Behaviours.Child
         {
             var faceSprite = GetFaceSprite();
             if (faceSprite == null)
-                throw new Exception($"Can not find face by stress {childStress}");
+                throw new Exception($"Can not find face by stress {_childStress}");
 
             childFace.sprite = GetFaceSprite();
         }
 
-
-        private Sprite GetFaceSprite() => 
-            faces.FirstOrDefault(f => f.maxStress >= childStress).face;
+        private Sprite GetFaceSprite() =>
+            faces.FirstOrDefault(f => f.maxStress >= _childStress).face;
     }
 }

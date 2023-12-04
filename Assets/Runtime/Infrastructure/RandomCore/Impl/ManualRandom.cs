@@ -16,7 +16,7 @@ namespace Runtime.Infrastructure.RandomCore.Impl
 
         public int Next(int min, int max)
         {
-            if (_previousInt == max) 
+            if (_previousInt >= max || _previousInt < min) 
                 _previousInt = min;
 
             return _previousInt++;

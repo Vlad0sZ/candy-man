@@ -4,6 +4,6 @@ namespace Runtime.GameEngine.Interfaces
 {
     public interface ICandyBowl
     {
-        void PutCandy(CandyModel candy);
+        void PutCandy(CandyType candy);
     }
 }
