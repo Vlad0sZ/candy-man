@@ -401,7 +401,7 @@ public class AiryUIAnimatedElement : MonoBehaviour
         {
             float t = (Time.time - startTime) / animationShowDuration;
 
-            rectTransform.rotation = Quaternion.Euler(Vector3.Lerp(rotateFrom, Quaternion.ToEulerAngles(initialRotation), t));
+            rectTransform.rotation = Quaternion.Euler(Vector3.Lerp(rotateFrom, initialRotation.eulerAngles, t));
 
             yield return (null);
         }
@@ -659,7 +659,7 @@ public class AiryUIAnimatedElement : MonoBehaviour
         {
             float t = (Time.time - startTime) / animationHideDuration;
 
-            rectTransform.rotation = Quaternion.Euler(Vector3.Lerp(Quaternion.ToEulerAngles(initialRotation), rotateTo, t));
+            rectTransform.rotation = Quaternion.Euler(Vector3.Lerp(initialRotation.eulerAngles, rotateTo, t));
 
             yield return (null);
         }
