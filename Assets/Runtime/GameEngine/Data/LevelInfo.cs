@@ -9,15 +9,17 @@ namespace Runtime.GameEngine.Data
     [CreateAssetMenu(fileName = "LevelInfo", menuName = "GameEngine/Data/LevelInfo")]
     public class LevelInfo : ScriptableObject
     {
+        public int id;
+        
         /// <summary>
         /// Количество чаш с конфетами на уровне
         /// </summary>
         [Range(1, 5)] public int bowlsCount = 1;
 
         /// <summary>
-        /// Время уровня в минутах
+        /// Время уровня в секундах
         /// </summary>
-        [Min(1)] public int levelTimeInMinutes = 1;
+        [Min(1)] public int levelTimeInSeconds = 30;
 
         /// <summary>
         /// Количество активных детей, просящих конфеты
@@ -28,5 +30,9 @@ namespace Runtime.GameEngine.Data
         /// Максимальное значение стреса детей, после которого уровень провалится
         /// </summary>
         [Min(100)] public int childrenStress = 100;
+
+        public bool hasCoalBagInLevel = true;
+
+        [SerializeField] public ChildGeneration childGeneration;
     }
 }

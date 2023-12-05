@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 2752337195483024466}
   - component: {fileID: 6789146192717821839}
   - component: {fileID: 6738154938940577033}
+  - component: {fileID: 8698825255417503852}
   m_Layer: 0
   m_Name: Bowl
   m_TagString: Untagged
@@ -119,7 +120,7 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: 0, y: 1}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -130,7 +131,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 11.5, y: 8.42}
+  m_Size: {x: 11.5, y: 11}
   m_EdgeRadius: 0
 --- !u!114 &6738154938940577033
 MonoBehaviour:
@@ -147,6 +148,18 @@ MonoBehaviour:
   gameCamera: {fileID: 0}
   draggableParent: {fileID: 1735693050582750516}
   candyFactory: {fileID: 0}
+--- !u!210 &8698825255417503852
+SortingGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 401027161787101838}
+  m_Enabled: 1
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 1
+  m_SortAtRoot: 0
 --- !u!1 &1760276728963208854
 GameObject:
   m_ObjectHideFlags: 0

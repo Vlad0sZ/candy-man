@@ -2,62 +2,76 @@
 using Runtime.GameEngine.Data;
 using Runtime.GameEngine.Factories;
 using Runtime.GameEngine.Interfaces;
-using Runtime.Infrastructure.RandomCore.Impl;
+using Runtime.GameEngine.Models;
+using Runtime.Infrastructure.Layer;
 using Runtime.Infrastructure.RandomCore.Interfaces;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace Runtime.GameEngine.Behaviours.Child
 {
     public class ChildHolder : MonoBehaviour
     {
-        [SerializeField] private Camera worldCamera;
-
-        [SerializeField] private Transform[] childrenPositions;
-
         [SerializeField] private CharacterFactory childrenFactory;
+        [SerializeField] private GridObject parentObject;
+        [SerializeField] private UnityEvent<int> onIncrement;
 
-        [Min(0)] [SerializeField] private float minDistanceBetweenSpawns = 1f;
+        public UnityEvent<int> OnIncrement => onIncrement;
 
-        [Min(0.1f)] [SerializeField] private float gizmosRadius = 0.1f;
-
-
-        private IChild[] _buffer;
-        private ChildBehaviourFactory _behaviourFactory;
         private IRandom _random;
-            
-        private void Start() =>
-            CreateChildren();
+        private int _childCount;
+        private ChildGeneration _childGeneration;
+        
+        private IChild[] _buffer;
+        private Transform _parent;
+        private ChildBehaviourFactory _behaviourFactory;
 
+        public void Init(IRandom random, int childCount, ChildGeneration generation)
+        {
+            _random = random;
+            _childCount = childCount;
+            _childGeneration = generation;
+            CreateChildren();
+        }
+
+        public void Deactivate()
+        {
+            if(_buffer == null)
+                return;
+
+            foreach (var child in _buffer) 
+                child?.DestroyChild();
+
+            _buffer = null;
+        }
+        
         private void CreateChildren()
         {
-            if (worldCamera == null) 
-                worldCamera = Camera.main;
-
-            _random = new UnityRandom();
+            _parent = parentObject.transform;
             _behaviourFactory = new ChildBehaviourFactory(_random);
 
-            _buffer = new IChild[childrenPositions.Length];
-            for (var index = 0; index < childrenPositions.Length; index++)
+            _buffer = new IChild[_childCount];
+            for (var index = 0; index < _childCount; index++)
                 CreateChildAt(index);
         }
 
         private void CreateChildAt(int index)
         {
-            var spawn = childrenPositions[index];
-            if (spawn == null)
-            {
-                Debug.LogError($"Spawn at {index} is null");
+            if(_buffer == null)
                 return;
-            }
             
             var childInformation = new ChildInformation()
             {
                 CandyBehaviour = _behaviourFactory.GetNext(),
-                MaxCandyInABag = _random.Next(2,5), // TODO from level info
-                WorldCamera = worldCamera,
+                MaxCandyInABag = _childGeneration.GetMinMaxCandyInABag(_random),
+                DisappointmentIncrement = _childGeneration.GetDisappointmentIncrement(_random),
+                StressDecrement = _childGeneration.GetStressDecrement(_random),
+                StressIncrement = _childGeneration.GetStressIncrement(_random),
+                Timer =  _childGeneration.GetChildTimer(_random),
             };
             
-            var child = childrenFactory.Instantiate(childInformation, spawn, false);
+            var child = childrenFactory.Instantiate(childInformation, _parent, false);
+            child.SetHierarchyIndex(index);
             _buffer[index] = child;
 
             child.OnChildStatusChanged.AddListener(ChildStatusChanged);
@@ -70,33 +84,11 @@ namespace Runtime.GameEngine.Behaviours.Child
                 throw new Exception("Child index in buffer was less than zero");
 
             child.DestroyChild();
-            Debug.Log($"Child at destroyed with {child.ChildStatus}");
 
+            int value = child.ChildStatus == ChildStatus.Sad ? child.StressIncrement : -child.StressDecrement;
+            onIncrement?.Invoke(value);
+            
             CreateChildAt(childIndex);
-        }
-
-        private void OnDrawGizmos()
-        {
-            if (childrenPositions == null || childrenPositions.Length == 0)
-                return;
-
-            var total = childrenPositions.Length;
-            var c = Gizmos.color;
-
-            Vector3 prev = default;
-            for (int i = 0; i < total; i++)
-            {
-                var t = childrenPositions[i];
-                if (t == null)
-                    continue;
-                var current = t.position;
-                Gizmos.color = Vector3.Distance(prev, current) > minDistanceBetweenSpawns ? Color.green : Color.red;
-                Gizmos.DrawSphere(current, gizmosRadius);
-
-                prev = t.position;
-            }
-
-            Gizmos.color = c;
         }
     }
 }

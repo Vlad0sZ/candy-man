@@ -14,6 +14,13 @@ namespace Runtime.Infrastructure.DragAndDrop.Behaviours
         
         protected ListenableValue<bool> IsDragging { get; } = new();
 
+        protected Camera GameCamera
+        {
+            get => gameCamera;
+            
+            set => gameCamera = value;
+        }
+
         protected Transform DraggableParent
         {
             get

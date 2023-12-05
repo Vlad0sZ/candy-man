@@ -10,6 +10,8 @@ namespace Runtime.GameEngine.Behaviours.Child.CandyBehaviours
     public abstract class ChildCandyBehaviour
     {
 
+        public event Action<float> OnProgress; 
+
         protected static Lazy<IEnumerable<CandyType>> LazyCandies => new(EnumExtensions.GetAllValues<CandyType>);
 
 
@@ -17,5 +19,8 @@ namespace Runtime.GameEngine.Behaviours.Child.CandyBehaviours
         
         
         public abstract GiftStatus GetCandyStatus(CandyType candyType);
+
+        protected void InvokeProgress(float progress) => 
+            OnProgress?.Invoke(progress);
     }
 }

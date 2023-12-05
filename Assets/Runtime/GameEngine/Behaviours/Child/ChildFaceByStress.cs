@@ -7,6 +7,8 @@ namespace Runtime.GameEngine.Behaviours.Child
     {
         public Sprite face;
 
+        public Color color;
+        
         [Range(0, 100)]
         public int maxStress;
     }

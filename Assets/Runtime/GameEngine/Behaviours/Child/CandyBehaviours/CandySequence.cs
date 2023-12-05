@@ -18,7 +18,7 @@ namespace Runtime.GameEngine.Behaviours.Child.CandyBehaviours
 
         public override void Init(IRandom random, int maxCandiesCountInABag, IBubbleBuilder bubbleBuilder)
         {
-            _maxSequence = Mathf.Min(maxCandiesCountInABag, MinSequenceCount);
+            _maxSequence = Mathf.Max(maxCandiesCountInABag, MinSequenceCount);
             _random = random;
             CreateSequence();
 
@@ -37,17 +37,27 @@ namespace Runtime.GameEngine.Behaviours.Child.CandyBehaviours
             if (candy != candyType)
             {
                 Debug.LogError($"Gift {candyType} but expected {candy}");
+                InvokeProgress();
                 return GiftStatus.TastelessCandy;
             }
             
             _candies.Pop();
+            InvokeProgress();
             return _candies.Count == 0 ? GiftStatus.EnoughCandy : GiftStatus.NeedMoreCandies;
         }
 
+        private void InvokeProgress()
+        {
+            var count = _maxSequence - _candies.Count;
+            InvokeProgress((float)count / _maxSequence);
+        }
 
 
-        private void CreateSequence() => 
-            _candies = LazyCandies.Value.Take(_maxSequence).ToShuffleStack(_random);
+        private void CreateSequence()
+        {
+            var all = LazyCandies.Value.ToShuffleList(_random).Take(_maxSequence);
+            _candies = new Stack<CandyType>(all);
+        }
     }
     
 }

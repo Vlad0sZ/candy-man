@@ -8,14 +8,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 170226412384462894, guid: feb9d81a773858a4c836f3e7e5be65c2, type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: 5.68
-      objectReference: {fileID: 0}
-    - target: {fileID: 170226412384462894, guid: feb9d81a773858a4c836f3e7e5be65c2, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: 4.34
-      objectReference: {fileID: 0}
     - target: {fileID: 2128671446176626703, guid: feb9d81a773858a4c836f3e7e5be65c2, type: 3}
       propertyPath: m_Name
       value: Child Pumpkin
@@ -76,6 +68,14 @@ PrefabInstance:
       propertyPath: m_Sprite
       value: 
       objectReference: {fileID: -749192202950132191, guid: 3d807ed39e4683748945d8f7a2e8e91f, type: 3}
+    - target: {fileID: 8350287218486430154, guid: feb9d81a773858a4c836f3e7e5be65c2, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8350287218486430154, guid: feb9d81a773858a4c836f3e7e5be65c2, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

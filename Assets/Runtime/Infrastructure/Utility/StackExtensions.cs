@@ -23,5 +23,8 @@ namespace Runtime.Infrastructure.Utility
 
         public static Stack<T> ToShuffleStack<T>(this IEnumerable<T> list) => 
             ToShuffleStack(list, new UnityRandom());
+
+        public static List<T> ToShuffleList<T>(this IEnumerable<T> list, IRandom random) => 
+            list.ToShuffleStack(random).ToList();
     }
 }

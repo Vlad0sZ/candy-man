@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Runtime.GameEngine.Behaviours.Child;
 using Runtime.GameEngine.Data;
 using Runtime.Infrastructure.FactoryBase;
@@ -13,13 +12,14 @@ namespace Runtime.GameEngine.Factories
     public class CharacterFactory : AbstractFactoryByData<ChildInformation, Child>
     {
         [SerializeField] private Child[] childrenPrefabs;
+        [SerializeField] private Camera worldCamera;
         
         private IRandom _random;
         private Stack<Child> _childrenStack;
 
         private void Awake()
         {
-            _random = new ManualRandom();
+            _random = new UnityRandom();
             _childrenStack = GetShuffleStack();
         }
 
@@ -31,7 +31,7 @@ namespace Runtime.GameEngine.Factories
 
             var childPrefab = _childrenStack.Pop();
             var child = Instantiate(childPrefab, parent, worldPositionStays);
-            child.Init(information);
+            child.Init(information, worldCamera);
 
             return child;
         }

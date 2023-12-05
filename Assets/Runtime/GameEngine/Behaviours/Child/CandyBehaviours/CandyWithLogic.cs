@@ -8,6 +8,7 @@ namespace Runtime.GameEngine.Behaviours.Child.CandyBehaviours
     public abstract class CandyWithLogic : ChildCandyBehaviour
     {
         private CandyType _rightType;
+        private int _leftCandies;
         private int _totalCandies;
 
         public override void Init(IRandom random, int maxCandiesCountInABag, IBubbleBuilder bubbleBuilder)
@@ -27,8 +28,9 @@ namespace Runtime.GameEngine.Behaviours.Child.CandyBehaviours
             if (IsTastelessCandy(candyType, _rightType) == false)
                 return GiftStatus.TastelessCandy;
 
-            _totalCandies -= 1;
-            return _totalCandies == 0 ? GiftStatus.EnoughCandy : GiftStatus.NeedMoreCandies;
+            _leftCandies += 1;
+            InvokeProgress((float)_leftCandies / _totalCandies);
+            return _totalCandies == _leftCandies ? GiftStatus.EnoughCandy : GiftStatus.NeedMoreCandies;
         }
         
         protected abstract bool IsTastelessCandy(CandyType candyType, CandyType randomOneCandy);

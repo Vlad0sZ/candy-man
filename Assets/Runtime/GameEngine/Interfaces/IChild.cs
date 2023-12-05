@@ -10,6 +10,8 @@ namespace Runtime.GameEngine.Interfaces
 
         int StressDecrement { get; }
 
+        void SetHierarchyIndex(int index);
+        
         void DestroyChild();
     }
 }
